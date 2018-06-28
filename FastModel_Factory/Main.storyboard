@@ -677,7 +677,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="1031" height="800"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="7Gf-j6-RUA">
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7Gf-j6-RUA">
                                 <rect key="frame" x="378" y="5" width="141" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="J2t-pS-o6M"/>
@@ -691,7 +691,7 @@
                                     <action selector="clickRadioButtone:" target="XfG-lQ-9wD" id="amd-dc-Vpj"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="QHd-G8-ERv">
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QHd-G8-ERv">
                                 <rect key="frame" x="535" y="5" width="143" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="139" id="TDd-oI-80B"/>
@@ -777,7 +777,7 @@
                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
                                     </subviews>
-                                    <color key="backgroundColor" red="0.15686274509803921" green="0.15686274509803921" blue="0.15686274509803921" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="cCl-5E-6cB">
                                     <rect key="frame" x="-100" y="-100" width="87" height="18"/>
@@ -800,7 +800,7 @@
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </textFieldCell>
                             </textField>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="NeJ-nA-aAQ">
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NeJ-nA-aAQ">
                                 <rect key="frame" x="694" y="5" width="94" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="83" id="0ML-Tk-GXq"/>

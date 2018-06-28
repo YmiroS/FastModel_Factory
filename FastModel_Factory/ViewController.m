@@ -34,9 +34,9 @@
 #define kSWHC_CLASS @("\nclass %@ :NSObject {\n%@\n}\n")
 #define kSexyJson_Class @("\nclass %@: SexyJson {\n%@\n}\n")
 #define kSexyJson_Struct @("\nstruct %@: SexyJson {\n%@\n}\n")
-#define kObjectMapper @("\n\n——--————/´ ¯/)\n——  ———--/—-/\n—  ————-/—-/\n———--/´¯/'--'/´¯`•_\n———-/'/--/—-/—--/¨¯\\\n——--('(———- ¯~/'--')\n— ——————-'—--/\n———-'\\'————_-•´\n— ———\\———--(\n—— ——-\\———-\n\n\nclass %@: Mappable {\n%@\n}\n\n")
+#define kObjectMapper @("\n**/**\n——--————/´ ¯/)\n——  ———--/—-/\n—  ————-/—-/\n———--/´¯/'--'/´¯`•_\n———-/'/--/—-/—--/¨¯\\\n——--('(———- ¯~/'--')\n— ——————-'—--/\n———-'\\'————_-•´\n— ———\\———--(\n—— ——-\\———-\n\n\nclass %@: Mappable {\n%@\n}\n\n")
 
-#define kHandyJson @("\n\n——--————/´ ¯/)\n——  ———--/—-/\n—  ————-/—-/\n———--/´¯/'--'/´¯`•_\n———-/'/--/—-/—--/¨¯\\\n——--('(———- ¯~/'--')\n— ——————-'—--/\n———-'\\'————_-•´\n— ———\\———--(\n—— ——-\\———-\n\n\nclass %@: HandyJSON {\n%@\n}\n\n")
+#define kHandyJson @("\n**/**\n——--————/´ ¯/)\n——  ———--/—-/\n—  ————-/—-/\n———--/´¯/'--'/´¯`•_\n———-/'/--/—-/—--/¨¯\\\n——--('(———- ¯~/'--')\n— ——————-'—--/\n———-'\\'————_-•´\n— ———\\———--(\n—— ——-\\———-\n\n\nclass %@: HandyJSON {\n%@\n}\n\n")
 
 
 
@@ -91,6 +91,7 @@ typedef enum : NSUInteger {
     NSString              *   _classPrefixName;    //类前缀
     BOOL                      _didMake;
     BOOL                      _firstLower;         //首字母小写
+    BOOL                      _firstEnter;
 }
 @property (weak) IBOutlet NSLayoutConstraint *classMHeightConstraint;
 
@@ -118,6 +119,7 @@ typedef enum : NSUInteger {
     _classField.editable = NO;
     _classMField.editable = NO;
     _firstLower = YES;
+    _firstEnter = YES;
     // Do any additional setup after loading the view.
     [self setTextViewStyle];
     [self setClassSourceContent:kSourcePlaceholdText];
@@ -159,6 +161,18 @@ typedef enum : NSUInteger {
     //    [value appendString:@"  * @author netyouli (whc)\n"];
     //    [value appendString:@"  * @website http://wuhaichao.com\n"];
     //    [value appendString:@"  * @github https://github.com/netyouli\n  */\n\n\n"];
+
+
+    [value appendString:@"\n\n/**\n  * Copyright "];
+    [value appendString:[dateStr componentsSeparatedByString:@"-"].firstObject];
+    [value appendString:@" FastModel_Factory\n  * Auto-generated: "];
+    [value appendString:dateStr];
+    [value appendString:@"\n  *\n"];
+    [value appendString:@"  * @author netyouli ()\n"];
+    [value appendString:@"  * Copyright © 2018 杨烁. All rights reserved.\n  */\n\n\n"];
+
+
+
     return value;
 }
 
@@ -168,6 +182,26 @@ typedef enum : NSUInteger {
         [_classField.textStorage setAttributedString:attrContent];
         [_classField.textStorage setFont:[NSFont systemFontOfSize:14]];
         [_classField.textStorage setForegroundColor:[NSColor colorWithRed:61.0 / 255.0 green:160.0 / 255.0 blue:151.0 / 255.0 alpha:1.0]];
+
+        if (_firstEnter) {
+            _firstEnter = NO;
+        }else{
+            NSOpenPanel * openPanel = [NSOpenPanel openPanel];
+            [openPanel setPrompt: @"转换"];
+            [openPanel setCanChooseDirectories:YES];
+            [openPanel setCanChooseFiles:NO];
+            if ([openPanel runModal] == NSModalResponseOK) {
+                NSString *path = [openPanel.URLs.firstObject path];
+                NSArray * splitArr = [content componentsSeparatedByString:@"**/**"];
+                [splitArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    NSString *str = obj;
+                    NSArray * splitArr = [str componentsSeparatedByString:@":"];
+                    NSArray * finalArr = [[splitArr firstObject] componentsSeparatedByString:@"class "];
+                    NSString *path = [NSString stringWithFormat:@"%@/0/%@.swift",path,[finalArr lastObject]];
+                    BOOL a = [str writeToFile:path atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+                }];
+            }
+        }
     }
 }
 
@@ -258,7 +292,7 @@ typedef enum : NSUInteger {
         if (dict == nil || ![NSJSONSerialization isValidJSONObject:dict]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
-            NSAlert * alert = [NSAlert alertWithMessageText:@"WHC" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"未知数据格式无法解析(请提供json字符串或者dictionary字符串)"];
+            NSAlert * alert = [NSAlert alertWithMessageText:@"What The Fuck!!!" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"未知数据格式无法解析(请提供json字符串或者dictionary字符串)"];
             [alert runModal];
 #pragma clang diagnostic pop
             return;

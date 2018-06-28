@@ -34,14 +34,13 @@
 #define kSWHC_CLASS @("\nclass %@ :NSObject {\n%@\n}\n")
 #define kSexyJson_Class @("\nclass %@: SexyJson {\n%@\n}\n")
 #define kSexyJson_Struct @("\nstruct %@: SexyJson {\n%@\n}\n")
-#define kObjectMapper @("\n**/**\n——--————/´ ¯/)\n——  ———--/—-/\n—  ————-/—-/\n———--/´¯/'--'/´¯`•_\n———-/'/--/—-/—--/¨¯\\\n——--('(———- ¯~/'--')\n— ——————-'—--/\n———-'\\'————_-•´\n— ———\\———--(\n—— ——-\\———-\n\n\nclass %@: Mappable {\n%@\n}\n\n")
-
-#define kHandyJson @("\n**/**\n——--————/´ ¯/)\n——  ———--/—-/\n—  ————-/—-/\n———--/´¯/'--'/´¯`•_\n———-/'/--/—-/—--/¨¯\\\n——--('(———- ¯~/'--')\n— ——————-'—--/\n———-'\\'————_-•´\n— ———\\———--(\n—— ——-\\———-\n\n\nclass %@: HandyJSON {\n%@\n}\n\n")
+#define kObjectMapper @("%@\n\nclass %@: Mappable {\n%@\n}\n\n\n\n\n\n")
+#define kHandyJson @("%@\n\nclass %@: HandyJSON {\n%@\n}\n\n\n\n\n\n")
 
 
 
 #define kObjectMapper_FuncMap (@"\n       required init?(map: Map) {\n   \n      }\n       func mapping(map: Map){\n       %@       \n       }\n")
-#define kHandyJson_FuncMap (@"\n       required init() {}\n\n       func mapping(mapper: HelpingMapper){\n       %@       \n       }\n")
+#define kHandyJson_FuncMap (@"\n       required init() {}\n\n       func mapping(mapper: HelpingMapper){\n       %@       \n       }\n\n       func didFinishMapping() {\n\n       }\n")
 
 #define kSexyJson_FuncMap (@"\n       public func sexyMap(_ map: [String : Any]) {\n       %@       \n       }\n")
 #define kSexyJson_Struct_FuncMap (@"\n       public mutating func sexyMap(_ map: [String : Any]) {\n       %@       \n       }\n")
@@ -148,37 +147,32 @@ typedef enum : NSUInteger {
     NSMutableString * value = [NSMutableString string];
     NSDate * date = [NSDate date];
     NSDateFormatter * dateFormatter = [NSDateFormatter new];
-    dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+    dateFormatter.dateFormat = @"yyyy-MM-dd HH/mm/ss";
     NSString * dateStr = [dateFormatter stringFromDate:date];
-    [value appendString:@"\n   嗖嗖嗖嗖嗖✈️🚀👽\n"];
+    [value appendString:@"**/**"];
+    [value appendString:@"\n//\n//"];
+    [value appendString:@" FastModel_Factory\n"];
+    [value appendString:@"// Created on "];
     [value appendString:dateStr];
-    [value appendString:@"\n\n"];
-    //    [value appendString:MiddleFinger];
-    //    [value appendString:@"\n\n/**\n  * Copyright "];
-    //    [value appendString:[dateStr componentsSeparatedByString:@"-"].firstObject];
-    //    [value appendString:@" KoalaReading_DataModelFactory\n  * Auto-generated: "];
-    //    [value appendString:@"\n  *\n"];
-    //    [value appendString:@"  * @author netyouli (whc)\n"];
-    //    [value appendString:@"  * @website http://wuhaichao.com\n"];
-    //    [value appendString:@"  * @github https://github.com/netyouli\n  */\n\n\n"];
-
-
-    [value appendString:@"\n\n/**\n  * Copyright "];
-    [value appendString:[dateStr componentsSeparatedByString:@"-"].firstObject];
-    [value appendString:@" FastModel_Factory\n  * Auto-generated: "];
-    [value appendString:dateStr];
-    [value appendString:@"\n  *\n"];
-    [value appendString:@"  * @author netyouli ()\n"];
-    [value appendString:@"  * Copyright © 2018 杨烁. All rights reserved.\n  */\n\n\n"];
-
-
-
+    [value appendString:@"\n"];
+    [value appendString:@"// Author MeetFresh\n"];
+    [value appendString:@"// Copyright © 2018 KoalaReading. All rights reserved.\n//"];
+    switch (_index) {
+        case ObjectMapper:
+            [value appendString:@"\n\n\nimport UIKit\nimport ObjectMapper"];
+            break;
+        case HandyJson:
+            [value appendString:@"\n\n\nimport UIKit\nimport HandyJSON"];
+            break;
+        default:
+            [value appendString:@"\n\n\n"];
+    }
     return value;
 }
 
 - (void)setClassHeaderContent:(NSString *)content {
     if (content != nil) {
-        NSMutableAttributedString * attrContent = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@",[content isEqualToString:kHeaderPlaceholdText] ? @"" : [self copyingRight],content]];
+        NSMutableAttributedString * attrContent = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@",content]];
         [_classField.textStorage setAttributedString:attrContent];
         [_classField.textStorage setFont:[NSFont systemFontOfSize:14]];
         [_classField.textStorage setForegroundColor:[NSColor colorWithRed:61.0 / 255.0 green:160.0 / 255.0 blue:151.0 / 255.0 alpha:1.0]];
@@ -187,19 +181,36 @@ typedef enum : NSUInteger {
             _firstEnter = NO;
         }else{
             NSOpenPanel * openPanel = [NSOpenPanel openPanel];
-            [openPanel setPrompt: @"转换"];
+            [openPanel setPrompt: @"导出"];
             [openPanel setCanChooseDirectories:YES];
             [openPanel setCanChooseFiles:NO];
+
+            __block int count = 0;
+            __block int classCount = 0;
             if ([openPanel runModal] == NSModalResponseOK) {
-                NSString *path = [openPanel.URLs.firstObject path];
+                NSString *filepath = [openPanel.URLs.firstObject path];
                 NSArray * splitArr = [content componentsSeparatedByString:@"**/**"];
                 [splitArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                     NSString *str = obj;
-                    NSArray * splitArr = [str componentsSeparatedByString:@":"];
-                    NSArray * finalArr = [[splitArr firstObject] componentsSeparatedByString:@"class "];
-                    NSString *path = [NSString stringWithFormat:@"%@/0/%@.swift",path,[finalArr lastObject]];
-                    BOOL a = [str writeToFile:path atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+                    if ([str containsString:@":"] == 1){
+                        NSArray * splitArr = [str componentsSeparatedByString:@":"];
+                        NSArray * finalArr = [[splitArr firstObject] componentsSeparatedByString:@"class "];
+                        classCount++;
+                        NSString *path = [NSString stringWithFormat:@"%@/%@.swift",filepath,[finalArr lastObject]];
+                        BOOL a = [str writeToFile:path atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+                        if (a){
+                            count++;
+                        }
+                    }
                 }];
+            }
+            if (count == classCount){
+                NSAlert * alert = [NSAlert alertWithMessageText:@"导出成功" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"全都成功了~~~~~~"];
+                [alert runModal];
+            }else{
+                NSAlert * alert = [NSAlert alertWithMessageText:@"导出失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"有%d个文件转换失败~~~~",classCount-count];
+                [alert runModal];
+
             }
         }
     }
@@ -331,7 +342,7 @@ typedef enum : NSUInteger {
                     }else if (_copyingCheckBox.state != 0) {
                         [_classString appendFormat:kSexyJson_CopyingCLASS,className,classContent];
                     }else {
-                        [_classString appendFormat:kObjectMapper,className,classContent];
+                        [_classString appendFormat:kObjectMapper,[self copyingRight],className,classContent];
                     }
                 }
                     break;
@@ -343,7 +354,7 @@ typedef enum : NSUInteger {
                     }else if (_copyingCheckBox.state != 0) {
                         [_classString appendFormat:kSexyJson_CopyingCLASS,className,classContent];
                     }else {
-                        [_classString appendFormat:kHandyJson,className,classContent];
+                        [_classString appendFormat:kHandyJson,[self copyingRight],className,classContent];
                     }
                 }
                     break;
@@ -465,7 +476,7 @@ typedef enum : NSUInteger {
                                 }else if (_copyingCheckBox.state != 0) {
                                     [_classString appendFormat:kSexyJson_CopyingCLASS,className,classContent];
                                 }else {
-                                    [_classString appendFormat:kObjectMapper,className,classContent];
+                                    [_classString appendFormat:kObjectMapper,[self copyingRight],className,classContent];
                                 }
                                 [propertyMap appendFormat:kObjectMapper_Map,propertyName,key];
                                 break;
@@ -478,7 +489,7 @@ typedef enum : NSUInteger {
                                 }else if (_copyingCheckBox.state != 0) {
                                     [_classString appendFormat:kSexyJson_CopyingCLASS,className,classContent];
                                 }else {
-                                    [_classString appendFormat:kHandyJson,className,classContent];
+                                    [_classString appendFormat:kHandyJson,[self copyingRight],className,classContent];
                                 }
                                 [propertyMap appendFormat:kHandyJson_Map,propertyName,key];
                                 break;
@@ -612,7 +623,7 @@ typedef enum : NSUInteger {
                                     }else if (_copyingCheckBox.state != 0) {
                                         [_classString appendFormat:kSexyJson_CopyingCLASS,className,classContent];
                                     }else {
-                                        [_classString appendFormat:kObjectMapper,className,classContent];
+                                        [_classString appendFormat:kObjectMapper,[self copyingRight],className,classContent];
                                     }
                                     [propertyMap appendFormat:kObjectMapper_Map,propertyName,key];
                                     break;
@@ -625,7 +636,7 @@ typedef enum : NSUInteger {
                                     }else if (_copyingCheckBox.state != 0) {
                                         [_classString appendFormat:kSexyJson_CopyingCLASS,className,classContent];
                                     }else {
-                                        [_classString appendFormat:kHandyJson,className,classContent];
+                                        [_classString appendFormat:kHandyJson,[self copyingRight],className,classContent];
                                     }
                                     [propertyMap appendFormat:kHandyJson_Map,propertyName,key];
                                     break;

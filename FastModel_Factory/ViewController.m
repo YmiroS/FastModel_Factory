@@ -78,10 +78,10 @@
 typedef enum : NSUInteger {
     Objc = 0,
     Swift,
+    ObjectMapper,
+    HandyJson,
     SexyJson_struct,
     SexyJson_class,
-    ObjectMapper,
-    HandyJson
 } WHCModelType;
 
 @interface ViewController (){
@@ -127,7 +127,8 @@ typedef enum : NSUInteger {
     frmae.size.height = 800;
     self.view.frame = frmae;
 
-    _comboxTitles = @[@"Objective-c",@"Swift",@"SexyJson(struct)",@"SexyJson(class)",@"ObjectMapper",@"HandyJson"];
+//    _comboxTitles = @[@"Objective-c",@"Swift",@"SexyJson(struct)",@"SexyJson(class)",@"ObjectMapper",@"HandyJson"];
+    _comboxTitles = @[@"Objective-c",@"Swift",@"ObjectMapper",@"HandyJson",@"--------",@"--------"];
     [_comboBox addItemsWithObjectValues:_comboxTitles];
     [_comboBox selectItemWithObjectValue:@"Objective-c"];
 
@@ -203,14 +204,14 @@ typedef enum : NSUInteger {
                         }
                     }
                 }];
-            }
-            if (count == classCount){
-                NSAlert * alert = [NSAlert alertWithMessageText:@"导出成功" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"全都成功了~~~~~~"];
-                [alert runModal];
-            }else{
-                NSAlert * alert = [NSAlert alertWithMessageText:@"导出失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"有%d个文件转换失败~~~~",classCount-count];
-                [alert runModal];
+                if (count == classCount){
+                    NSAlert * alert = [NSAlert alertWithMessageText:@"导出成功" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"全都成功了~~~~~~"];
+                    [alert runModal];
+                }else{
+                    NSAlert * alert = [NSAlert alertWithMessageText:@"导出失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"有%d个文件转换失败~~~~",classCount-count];
+                    [alert runModal];
 
+                }
             }
         }
     }

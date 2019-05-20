@@ -40,13 +40,13 @@
 
 
 #define kObjectMapper_FuncMap (@"\n       required init?(map: Map) {\n   \n      }\n       func mapping(map: Map){\n       %@       \n       }\n")
-#define kHandyJson_FuncMap (@"\n       required init() {}\n\n       func mapping(mapper: HelpingMapper){\n       %@       \n       }\n\n       func didFinishMapping() {\n\n       }\n")
+#define kHandyJson_FuncMap (@"\n    required init() {}\n\n    func mapping(mapper: HelpingMapper){\n       %@       }\n\n    func didFinishMapping() {\n}\n")
 
 #define kSexyJson_FuncMap (@"\n       public func sexyMap(_ map: [String : Any]) {\n       %@       \n       }\n")
 #define kSexyJson_Struct_FuncMap (@"\n       public mutating func sexyMap(_ map: [String : Any]) {\n       %@       \n       }\n")
 #define kSexyJson_Map (@"\n              %@        <<<        map[\"%@\"]")
 #define kObjectMapper_Map (@"\n        %@  <- map[\"%@\"]")
-#define kHandyJson_Map (@"\n            mapper <<<\n                  %@ <-- [\"%@\"]")
+#define kHandyJson_Map (@"\n        mapper <<<\n            %@ <-- [\"%@\"]")
 
 
 #define kSexyJson_CodingCLASS @("\nclass %@ :NSObject, SexyJson, NSCoding {\n \n       required init(coder decoder: NSCoder) {\n              super.init()\n              self.sexy_decode(decoder)\n       }\n\n       func encode(with aCoder: NSCoder) {\n              self.sexy_encode(aCoder)\n       }\n\n       required override init() {}  \n\n%@\n}\n")
@@ -67,8 +67,8 @@
 
 
 
-#define kSWHC_PROPERTY @("       ///\<#name#\>\n       var %@: %@?\n")
-#define kSWHC_ASSGIN_PROPERTY @("       ///\<#name#\>\n       var %@: %@\n")
+#define kSWHC_PROPERTY @("    ///\<#name#\>\n    var %@: %@?\n")
+#define kSWHC_ASSGIN_PROPERTY @("    ///\<#name#\>\n    var %@: %@\n")
 
 #define kInputJsonPlaceholdText @("请输入json或者xml字符串")
 #define kSourcePlaceholdText @("自动生成对象模型类源文件")

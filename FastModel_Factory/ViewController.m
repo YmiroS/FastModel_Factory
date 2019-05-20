@@ -291,7 +291,6 @@ typedef enum : NSUInteger {
     NSString  * className = _classNameField.stringValue;
     NSString  * json = _jsonField.textStorage.string;
     _classPrefixName = _classPreFixField.stringValue;
-        className = kWHC_DEFAULT_CLASS_NAME;
     if(className == nil){
         _classPrefixName = kWHC_DEFAULT_CLASS_NAME;
     }

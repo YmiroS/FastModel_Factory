@@ -7,11 +7,11 @@
 //
 
 #import "ViewController.h"
-#import "WHC_XMLParser.h"
+#import "WHCLib/WHC_XMLParser.h"
 #import <objc/runtime.h>
 
 
-#define kWHC_DEFAULT_CLASS_NAME @("KRModel")
+#define kWHC_DEFAULT_CLASS_NAME @("ZYModel")
 #define kWHC_CLASS       @("\n@interface %@ :NSObject\n%@\n@end\n")
 #define kWHC_CodingCLASS       @("\n@interface %@ :NSObject <NSCoding>\n%@\n@end\n")
 #define kWHC_CopyingCLASS       @("\n@interface %@ :NSObject <NSCopying>\n%@\n@end\n")
@@ -67,8 +67,8 @@
 
 
 
-#define kSWHC_PROPERTY @("       var %@: %@?\n")
-#define kSWHC_ASSGIN_PROPERTY @("       var %@: %@\n")
+#define kSWHC_PROPERTY @("       ///\<#name#\>\n       var %@: %@?\n")
+#define kSWHC_ASSGIN_PROPERTY @("       ///\<#name#\>\n       var %@: %@\n")
 
 #define kInputJsonPlaceholdText @("请输入json或者xml字符串")
 #define kSourcePlaceholdText @("自动生成对象模型类源文件")
@@ -88,6 +88,7 @@ typedef enum : NSUInteger {
     NSMutableString       *   _classString;        //存类头文件内容
     NSMutableString       *   _classMString;       //存类源文件内容
     NSString              *   _classPrefixName;    //类前缀
+    NSString              *   _noClassPrefixName;
     BOOL                      _didMake;
     BOOL                      _firstLower;         //首字母小写
     BOOL                      _firstEnter;
@@ -95,6 +96,7 @@ typedef enum : NSUInteger {
 @property (weak) IBOutlet NSLayoutConstraint *classMHeightConstraint;
 
 @property (nonatomic , strong)IBOutlet  NSTextField  * classNameField;
+@property (nonatomic , strong)IBOutlet  NSTextField  * classPreFixField;
 @property (nonatomic , strong)IBOutlet  NSTextView  * jsonField;
 @property (nonatomic , strong)IBOutlet  NSTextView  * classField;
 @property (nonatomic , strong)IBOutlet  NSTextView  * classMField;
@@ -145,19 +147,29 @@ typedef enum : NSUInteger {
 }
 
 - (NSString *)copyingRight {
+    
+    char *lo = getlogin();
+    NSString * str = [[NSString alloc] initWithCString:lo encoding:NSASCIIStringEncoding];
     NSMutableString * value = [NSMutableString string];
     NSDate * date = [NSDate date];
     NSDateFormatter * dateFormatter = [NSDateFormatter new];
-    dateFormatter.dateFormat = @"yyyy-MM-dd HH/mm/ss";
+    dateFormatter.dateFormat = @"yyyy-MM-dd";
+    NSDate * dateY = [NSDate date];
+    NSDateFormatter * dateFormatterY = [NSDateFormatter new];
+    dateFormatterY.dateFormat = @"yyyy";
     NSString * dateStr = [dateFormatter stringFromDate:date];
+    NSString * dateStrY = [dateFormatterY stringFromDate:dateY];
     [value appendString:@"**/**"];
-    [value appendString:@"\n//\n//"];
-    [value appendString:@" FastModel_Factory\n"];
-    [value appendString:@"// Created on "];
+    [value appendString:@"\n//\n// "];
+    [value appendFormat:@"FastModel_Factory\n"];
+    [value appendString:@"// iReader"];
+    [value appendString:@"\n//\n"];
+    [value appendString:@"// Created by "];
+    [value appendString:str];
+    [value appendString:@" on "];
     [value appendString:dateStr];
-    [value appendString:@"\n"];
-    [value appendString:@"// Author MeetFresh\n"];
-    [value appendString:@"// Copyright © 2018 KoalaReading. All rights reserved.\n//"];
+    [value appendString:@".\n"];
+    [value appendFormat:@"// Copyright © %@ iReader. All rights reserved.\n//", dateStrY];
     switch (_index) {
         case ObjectMapper:
             [value appendString:@"\n\n\nimport UIKit\nimport ObjectMapper"];
@@ -234,13 +246,6 @@ typedef enum : NSUInteger {
     _classField.backgroundColor = _jsonField.backgroundColor;
 }
 
-- (IBAction)clickCheckUpdate:(NSButton *)sender {
-    if (sender.tag == 1) {
-        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.wuhaichao.com"]];
-    }else if (sender.tag == 2) {
-        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.wuhaichao.com/pay/"]];
-    }
-}
 
 - (IBAction)clickFirstLower:(NSButton *)sender {
     _firstLower = sender.state == 1;
@@ -259,6 +264,17 @@ typedef enum : NSUInteger {
 
 }
 - (IBAction)clickChangeComboBox:(NSComboBox *)sender {
+    NSString *str = self.classNameField.stringValue;
+    NSString * rep = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    if ([rep  isEqual: @""]){
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
+        NSAlert * alert = [NSAlert alertWithMessageText:@"类名没有填写!!!" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@""];
+        [alert runModal];
+#pragma clang diagnostic pop
+        return;
+    }
+    
     _index = sender.indexOfSelectedItem;
     _isSwift = _index != 0;
     _classMHeightConstraint.constant = (self.isSwift ? 0 : 180);
@@ -274,12 +290,14 @@ typedef enum : NSUInteger {
     [_classMString deleteCharactersInRange:NSMakeRange(0, _classMString.length)];
     NSString  * className = _classNameField.stringValue;
     NSString  * json = _jsonField.textStorage.string;
-    _classPrefixName = @"";
-    if(className == nil){
+    _classPrefixName = _classPreFixField.stringValue;
         className = kWHC_DEFAULT_CLASS_NAME;
+    if(className == nil){
+        _classPrefixName = kWHC_DEFAULT_CLASS_NAME;
     }
     if(className.length == 0){
         className = kWHC_DEFAULT_CLASS_NAME;
+        _classPrefixName = kWHC_DEFAULT_CLASS_NAME;
     }
     if(json && json.length){
         NSDictionary  * dict = nil;
@@ -311,7 +329,7 @@ typedef enum : NSUInteger {
         }
         NSString * classContent = [self handleDataEngine:dict key:@""];
         if(!self.isSwift){
-            if (_classPrefixName.length > 0) {
+            if (_noClassPrefixName.length > 0) {
                 [_classMString appendFormat:kWHC_CLASS_Prefix_M,className,_classPrefixName];
             }else {
                 if (_codingCheckBox.state != 0 && _copyingCheckBox.state != 0) {
@@ -428,7 +446,7 @@ typedef enum : NSUInteger {
         NSMutableString  * propertyMap = [NSMutableString new];
         if([object isKindOfClass:[NSDictionary class]]){
             NSDictionary  * dict = object;
-            if (_classPrefixName.length > 0) {
+            if (_noClassPrefixName.length > 0) {
                 if (!self.isSwift) {
                     [property appendFormat:kWHC_Prefix_H_Func,_classPrefixName];
                 }else {
@@ -451,7 +469,7 @@ typedef enum : NSUInteger {
                         }else {
                             [_classString appendFormat:kWHC_CLASS,className,classContent];
                         }
-                        if (_classPrefixName.length > 0) {
+                        if (_noClassPrefixName.length > 0) {
                             [_classMString appendFormat:kWHC_CLASS_Prefix_M,className,_classPrefixName];
                         }else {
                             if (_codingCheckBox.state != 0 && _copyingCheckBox.state != 0) {
@@ -599,7 +617,7 @@ typedef enum : NSUInteger {
                             }else {
                                 [_classString appendFormat:kWHC_CLASS,className,classContent];
                             }
-                            if (_classPrefixName.length > 0) {
+                            if (_noClassPrefixName.length > 0) {
                                 [_classMString appendFormat:kWHC_CLASS_Prefix_M,className,_classPrefixName];
                             }else {
                                 if (_codingCheckBox.state != 0 && _copyingCheckBox.state != 0) {
@@ -724,7 +742,7 @@ typedef enum : NSUInteger {
                             [property appendFormat:kSWHC_ASSGIN_PROPERTY,propertyName,@"Bool = false"];
                         }else {
                             if ([propertyName hasSuffix:@"Id"] || [propertyName containsString:@"Time"] || [propertyName containsString:@"time"] || [propertyName hasSuffix:@"ID"] || [propertyName hasSuffix:@"id"]){
-                                [property appendFormat:kSWHC_ASSGIN_PROPERTY,propertyName,@"Int64 = 0"];
+                                [property appendFormat:kSWHC_ASSGIN_PROPERTY,propertyName,@"String?"];
                             }else{
                                 [property appendFormat:kSWHC_ASSGIN_PROPERTY,propertyName,@"Int = 0"];
                             }
@@ -800,7 +818,7 @@ typedef enum : NSUInteger {
                 }
                 break;
             case HandyJson:
-                if (![property containsString:@"func mapping(map: Map)"]) {
+                if (![property containsString:@"func mapping(mapper: HelpingMapper)"]) {
                     [property appendFormat:kHandyJson_FuncMap,[self autoAlign:propertyMap]];
                 }
                 break;

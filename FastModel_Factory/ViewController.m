@@ -160,7 +160,7 @@ typedef enum : NSUInteger {
     NSString * dateStr = [dateFormatter stringFromDate:date];
     NSString * dateStrY = [dateFormatterY stringFromDate:dateY];
     [value appendString:@"**/**"];
-    [value appendString:@"\n//\n// "];
+    [value appendString:@"//\n// "];
     [value appendFormat:@"FastModel_Factory\n"];
     [value appendString:@"// iReader"];
     [value appendString:@"\n//\n"];

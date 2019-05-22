@@ -40,7 +40,7 @@
 
 
 #define kObjectMapper_FuncMap (@"\n       required init?(map: Map) {\n   \n      }\n       func mapping(map: Map){\n       %@       \n       }")
-#define kHandyJson_FuncMap (@"\n    required init() {}\n\n    func mapping(mapper: HelpingMapper) {\n       %@       }\n\n    func didFinishMapping() {\n}")
+#define kHandyJson_FuncMap (@"\n    required init() {}\n\n    func mapping(mapper: HelpingMapper) {\n       %@       }\n\n    func didFinishMapping() {\n    }")
 
 #define kSexyJson_FuncMap (@"\n       public func sexyMap(_ map: [String : Any]) {\n       %@       \n       }\n")
 #define kSexyJson_Struct_FuncMap (@"\n       public mutating func sexyMap(_ map: [String : Any]) {\n       %@       \n       }\n")
